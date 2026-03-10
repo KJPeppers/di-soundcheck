@@ -1650,36 +1650,8 @@
         });
     }
 
-    // ===== GOOGLE FORM SUBMISSION =====
-    const FORM_ID = '1FAIpQLSdGRqvGhxy4BucwwxjoPRHuSWaa8XMl_gMhDeCAQ5DuJvwqQA';
-    const FORM_ENDPOINT = `https://docs.google.com/forms/d/e/${FORM_ID}/formResponse`;
-
-    const FORM_FIELDS = {
-      portfolio:          'entry.682283282',
-      project:            'entry.996806354',
-      album:              'entry.44120815',
-      customerExperience: 'entry.1820062093',
-      provenDelivery:     'entry.1380904896',
-      technicalExpertise: 'entry.862573675',
-      q1:  'entry.486732663',
-      q2:  'entry.116655338',
-      q3:  'entry.1446466544',
-      q4:  'entry.1263157119',
-      q5:  'entry.2028314775',
-      q6:  'entry.378773354',
-      q7:  'entry.863764772',
-      q8:  'entry.576956734',
-      q9:  'entry.80582380',
-      q10: 'entry.1560823949',
-      q11: 'entry.1377575634',
-      q12: 'entry.350458964',
-      q13: 'entry.616144422',
-      q14: 'entry.1000698596',
-      q15: 'entry.14987751',
-      q16: 'entry.1112451272',
-      q17: 'entry.1755995015',
-      q18: 'entry.2114251015'
-    };
+    // ===== APPS SCRIPT SUBMISSION =====
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxDfRaAPKQJ3bF7S1hlKmL42Rpwov5QtYoDB25kpXFn_NDKBGIn9TYzLgNtIY-n41du/exec';
 
     const PORTFOLIOS = ['CS&D', 'HC&J'];
 
@@ -1700,28 +1672,25 @@
     }
 
     function submitToGoogleForm(portfolio, project, archetype, themeScores) {
-      const body = new URLSearchParams();
-
-      // Identifier fields
-      body.append(FORM_FIELDS.portfolio, portfolio);
-      body.append(FORM_FIELDS.project, project);
-      body.append(FORM_FIELDS.album, archetype.album);
-
-      // Theme scores
-      body.append(FORM_FIELDS.customerExperience, themeScores.customerExperience);
-      body.append(FORM_FIELDS.provenDelivery, themeScores.provenDelivery);
-      body.append(FORM_FIELDS.technicalExpertise, themeScores.technicalExpertise);
+      const payload = {
+        Portfolio: portfolio,
+        Project: project,
+        Album: archetype.album,
+        customerExperience: themeScores.customerExperience,
+        provenDelivery: themeScores.provenDelivery,
+        technicalExpertise: themeScores.technicalExpertise
+      };
 
       // Individual question scores by original ID
       for (let i = 1; i <= 18; i++) {
-        body.append(FORM_FIELDS[`q${i}`], getQuestionScoreById(i));
+        payload[`Q${i}`] = getQuestionScoreById(i);
       }
 
-      return fetch(FORM_ENDPOINT, {
+      return fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         mode: 'no-cors',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: body.toString()
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
       });
     }
 
