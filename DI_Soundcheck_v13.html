@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DI Soundcheck</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;600;700&family=Nunito+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ===== CSS RESET ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    /* ===== CSS VARIABLES (Brand Colors) ===== */
+    :root {
+      --pink: #DA10AB;
+      --charcoal: #1D252C;
+      --cyan: #00B0E6;
+      --white: #FFFFFF;
+      --light-gray: #E8E9EA;
+      --steel-gray: #4A5156;
+      --medium-gray: #777C80;
+      --deep-magenta: #94007B;
+      --light-cyan: #6DD6FF;
+      --pale-pink: #FEB0F9;
+      --deep-cyan: #00709D;
+      --sky-blue: #ACE2FF;
+    }
+    
+    /* ===== BASE STYLES ===== */
+    body {
+      font-family: 'Nunito Sans', sans-serif;
+      color: var(--charcoal);
+      line-height: 1.6;
+      background: var(--white);
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Roboto', sans-serif;
+      font-weight: 700;
+    }
+    
+    /* ===== SCREEN MANAGEMENT ===== */
+    .screen {
+      display: none !important;
+      min-height: 100vh;
+    }
+    
+    .screen.active {
+      display: block !important;
+    }
+    
+    /* ===== INTRO SCREEN ===== */
+    #introScreen {
+      background: var(--charcoal);
+    }
+    
+    #introScreen.active {
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    
+    .intro-container {
+      max-width: 800px;
+      text-align: center;
+      color: var(--white);
+    }
+    
+    .intro-title {
+      font-size: 42px;
+      font-weight: 700;
+      color: var(--pink);
+      margin-bottom: 40px;
+      letter-spacing: 1px;
+      line-height: 1.2;
+    }
+    
+    .intro-text {
+      font-size: 18px;
+      line-height: 1.8;
+      margin-bottom: 40px;
+      color: var(--light-gray);
+    }
+    
+    .intro-text p {
+      margin-bottom: 20px;
+    }
+    
+    .intro-instruction-box {
+      background: rgba(218, 16, 171, 0.1);
+      border: 2px solid var(--pink);
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 30px;
+    }
+    
+    .intro-instruction-box p {
+      color: var(--white);
+      font-size: 16px;
+      line-height: 1.6;
+      margin: 0;
+      font-weight: 600;
+    }
+    
+    .intro-footer {
+      font-size: 16px;
+      color: var(--medium-gray);
+      margin-bottom: 40px;
+    }
+    
+    .intro-footer p {
+      margin: 8px 0;
+    }
+    
+    .intro-footer strong {
+      color: var(--white);
+    }
+    
+    /* ===== BUTTONS ===== */
+    .btn {
+      font-family: 'Roboto', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      padding: 16px 40px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .btn-primary {
+      background: var(--pink);
+      color: var(--white);
+    }
+    
+    .btn-primary:hover {
+      background: var(--deep-magenta);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(218, 16, 171, 0.4);
+    }
+    
+    .btn-secondary {
+      background: var(--cyan);
+      color: var(--white);
+    }
+    
+    .btn-secondary:hover {
+      background: var(--deep-cyan);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 176, 230, 0.4);
+    }
+    
+    .btn:disabled {
+      background: var(--light-gray);
+      color: var(--medium-gray);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    /* ===== QUIZ SCREEN ===== */
+    #quizScreen {
+      background: var(--white);
+      padding: 0;
+    }
+    
+    .quiz-header {
+      background: var(--charcoal);
+      color: var(--white);
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .quiz-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--pink);
+      letter-spacing: 1px;
+    }
+    
+    .quiz-counter {
+      font-size: 18px;
+      color: var(--light-gray);
+    }
+    
+    .progress-container {
+      background: var(--light-gray);
+      height: 8px;
+      width: 100%;
+    }
+    
+    .progress-bar {
+      background: var(--pink);
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    
+    .quiz-content {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 30px 40px 20px 40px;
+    }
+    
+    .question-instruction {
+      background: rgba(218, 16, 171, 0.05);
+      border-left: 4px solid var(--pink);
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: var(--medium-gray);
+      font-style: italic;
+      line-height: 1.4;
+    }
+    
+    .question-text {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 30px;
+      line-height: 1.4;
+    }
+    
+    .answer-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+    
+    .answer-option {
+      border: 2px solid var(--light-gray);
+      border-radius: 8px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: var(--white);
+      font-size: 18px;
+      text-align: left;
+      display: flex;
+      align-items: center;
+    }
+    
+    .answer-option:hover {
+      border-color: var(--cyan);
+      background: #f8f9fa;
+    }
+    
+    .answer-option.selected {
+      border-color: var(--pink);
+      background: #fff5fc;
+    }
+    
+    .answer-option input[type="radio"] {
+      margin-right: 12px;
+      cursor: pointer;
+    }
+    
+    .answer-option label {
+      cursor: pointer;
+      flex: 1;
+    }
+    
+    .answer-option-dontknow {
+      background: #f5f5f5;
+      font-style: italic;
+      color: var(--medium-gray);
+    }
+    
+    .answer-option-dontknow:hover {
+      background: #ebebeb;
+      border-color: var(--steel-gray);
+    }
+    
+    .answer-option-dontknow.selected {
+      border-color: var(--steel-gray);
+      background: #e0e0e0;
+    }
+    
+    .quiz-navigation {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    
+    .quiz-navigation button {
+      flex: 1;
+      max-width: 200px;
+    }
+    
+    /* ===== RESULTS SCREEN ===== */
+    #resultsScreen {
+      background: var(--charcoal);
+      min-height: 100vh;
+      padding: 0;
+    }
+    
+    .results-header {
+      text-align: left;
+      padding: 30px 60px;
+      background: var(--charcoal);
+      border-bottom: 2px solid var(--steel-gray);
+    }
+    
+    .results-title {
+      font-size: 24px;
+      color: var(--white);
+      font-weight: 600;
+    }
+    
+    .results-framing {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 30px 30px;
+      text-align: left;
+      color: var(--medium-gray);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    
+    .results-content-3col {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 30px;
+      display: grid;
+      grid-template-columns: 35% 40% 25%;
+      gap: 40px;
+      align-items: start;
+    }
+    
+    /* Album Column (Left) */
+    .results-album-column {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    
+    .album-cover {
+      width: 380px;
+      height: 380px;
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+    
+    .album-cover-fallback {
+      width: 380px;
+      height: 380px;
+      background: var(--steel-gray);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      text-align: center;
+    }
+    
+    .album-cover-fallback svg {
+      width: 80px;
+      height: 80px;
+      fill: var(--pink);
+      margin-bottom: 20px;
+    }
+    
+    .fallback-album-title {
+      color: var(--pink);
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .fallback-artist-name {
+      color: var(--white);
+      font-size: 14px;
+    }
+    
+    /* Narrative Column (Center) */
+    .results-narrative-column {
+      color: var(--white);
+    }
+    
+    .album-header-label {
+      font-size: 14px;
+      color: var(--medium-gray);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    
+    .album-title-main {
+      font-size: 32px;
+      color: var(--pink);
+      font-weight: 700;
+      margin-bottom: 6px;
+      line-height: 1.2;
+    }
+    
+    .artist-name-sub {
+      font-size: 18px;
+      color: var(--cyan);
+      margin-bottom: 30px;
+      font-weight: 400;
+    }
+    
+    .narrative-paragraph {
+      font-size: 16px;
+      line-height: 1.8;
+      margin-bottom: 20px;
+      color: var(--light-gray);
+    }
+    
+    /* Radar Column (Right) */
+    .results-radar-column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .radar-label-top {
+      font-size: 14px;
+      color: var(--medium-gray);
+      text-align: center;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    
+    .radar-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    
+    .radar-label-bottom {
+      font-size: 14px;
+      color: var(--medium-gray);
+      text-align: center;
+      line-height: 1.5;
+    }
+    
+    #radarChart {
+      max-width: 280px;
+    }
+    
+    .results-footer {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    /* ===== SUBMISSION FORM ===== */
+    .submission-form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .submission-select {
+      font-family: 'Nunito Sans', sans-serif;
+      font-size: 15px;
+      padding: 10px 14px;
+      border: 2px solid var(--steel-gray);
+      border-radius: 6px;
+      background: var(--charcoal);
+      color: var(--white);
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .submission-select:focus {
+      outline: none;
+      border-color: var(--pink);
+    }
+
+    .submission-select option {
+      background: var(--charcoal);
+      color: var(--white);
+    }
+
+    .submission-confirmation {
+      font-family: 'Nunito Sans', sans-serif;
+      font-size: 15px;
+      color: var(--cyan);
+      text-align: center;
+      padding: 10px 0;
+      font-weight: 600;
+    }
+    
+    /* ===== RESPONSIVE DESIGN ===== */
+    
+    /* Tablet */
+    @media (max-width: 1024px) {
+      .results-content-3col {
+        grid-template-columns: 35% 40% 25%;
+        gap: 30px;
+        padding: 40px 40px;
+      }
+      
+      .album-cover,
+      .album-cover-fallback {
+        width: 320px;
+        height: 320px;
+      }
+      
+      .archetype-name {
+        font-size: 32px;
+      }
+      
+      .narrative-paragraph {
+        font-size: 15px;
+      }
+      
+      #radarChart {
+        max-width: 260px;
+      }
+    }
+    
+    /* Mobile */
+    @media (max-width: 768px) {
+      .intro-title {
+        font-size: 32px;
+      }
+      
+      .intro-text {
+        font-size: 16px;
+      }
+      
+      .intro-instruction-box {
+        padding: 20px;
+      }
+      
+      .intro-instruction-box p {
+        font-size: 15px;
+      }
+      
+      .intro-footer {
+        font-size: 14px;
+      }
+      
+      .quiz-header {
+        padding: 16px 20px;
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+      }
+      
+      .quiz-title {
+        font-size: 20px;
+      }
+      
+      .quiz-content {
+        padding: 30px 20px 20px 20px;
+      }
+      
+      .question-text {
+        font-size: 20px;
+      }
+      
+      .answer-option {
+        font-size: 16px;
+        padding: 16px;
+      }
+      
+      .quiz-navigation {
+        flex-direction: column;
+      }
+      
+      .quiz-navigation button {
+        max-width: 100%;
+      }
+      
+      .results-header {
+        padding: 20px 20px;
+      }
+      
+      .results-title {
+        font-size: 20px;
+      }
+      
+      .results-framing {
+        padding: 30px 20px 20px;
+        font-size: 15px;
+      }
+      
+      .results-content-3col {
+        grid-template-columns: 1fr;
+        gap: 30px;
+        padding: 30px 20px;
+      }
+      
+      .album-cover,
+      .album-cover-fallback {
+        width: 300px;
+        height: 300px;
+      }
+      
+      .archetype-name {
+        font-size: 28px;
+      }
+      
+      .album-artist-info {
+        font-size: 16px;
+      }
+      
+      .narrative-paragraph {
+        font-size: 15px;
+      }
+      
+      #radarChart {
+        max-width: 250px;
+      }
+      
+      .radar-label-top,
+      .radar-label-bottom {
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== INTRO SCREEN ===== -->
+  <div id="introScreen" class="screen active">
+    <div class="intro-container">
+      <h1 class="intro-title">WELCOME TO YOUR DI SOUNDCHECK</h1>
+      
+      <div class="intro-text">
+        <p>Every team has a rhythm. The way you collaborate, plan, and adapt to change creates a unique sound—your approach to Design Intelligence® in action.</p>
+        
+        <p>We want to understand how DI is working for you, your team, and your clients. This isn't a test. There are no right or wrong answers—just honest reflections on how your team actually works.</p>
+        
+        <p>You'll answer 18 questions about your team's practices. At the end, you'll discover your team's unique sound and see where DI is hitting strongest.</p>
+      </div>
+      
+      <div class="intro-instruction-box">
+        <p style="margin-bottom: 16px; font-weight: 600; text-align: left;">Things to keep in mind as you proceed:</p>
+        <ol style="margin: 0; padding-left: 24px; line-height: 1.8; text-align: left;">
+          <li>Your responses are confidential. Results will be aggregated with your team</li>
+          <li>Select what's MOST true. For each question, more than one option may represent your team. Choose the option your team would prioritize most regularly</li>
+          <li>The whole thing will take about 10-15 minutes</li>
+        </ol>
+      </div>
+      
+      <button class="btn btn-primary" id="startButton">Start Soundcheck</button>
+    </div>
+  </div>
+
+  <!-- ===== QUIZ SCREEN ===== -->
+  <div id="quizScreen" class="screen">
+    <div class="quiz-header">
+      <div class="quiz-title">DI SOUNDCHECK</div>
+      <div class="quiz-counter">Question <span id="currentQuestionNum">1</span> / 18</div>
+    </div>
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    
+    <div class="quiz-content">
+      <div class="question-instruction-container" id="questionInstruction"></div>
+      <div class="question-text" id="questionText"></div>
+      <div class="answer-options" id="answerOptions"></div>
+      
+      <div class="quiz-navigation">
+        <button class="btn btn-secondary" id="prevBtn" onclick="previousQuestion()" disabled>Previous</button>
+        <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" disabled>Next</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== RESULTS SCREEN ===== -->
+  <div id="resultsScreen" class="screen">
+    <div class="results-header">
+      <div class="results-title">Your Design Intelligence® Soundcheck</div>
+    </div>
+    
+    <div class="results-framing">
+      Think of this as your team's current vibe—a playback of the patterns that define how your team plans, builds, and adapts together. Every team has a mix: some strengths lead, others add depth and support.
+    </div>
+    
+    <div class="results-content-3col">
+      <!-- Left Column: Album Cover -->
+      <div class="results-album-column">
+        <div id="albumCoverContainer"></div>
+      </div>
+      
+      <!-- Center Column: Narrative -->
+      <div class="results-narrative-column">
+        <div class="album-header-label">Your team's DI Sound:</div>
+        <h2 class="album-title-main" id="albumTitle"></h2>
+        <div class="artist-name-sub" id="artistName"></div>
+        <p class="narrative-paragraph" id="narrative1"></p>
+        <p class="narrative-paragraph" id="narrative2"></p>
+        <p class="narrative-paragraph" id="narrative3"></p>
+      </div>
+      
+      <!-- Right Column: Radar Chart -->
+      <div class="results-radar-column">
+        <div class="radar-label-top">A snapshot of how your team balances across the DI Essentials</div>
+        <div class="radar-container">
+          <canvas id="radarChart" width="400" height="400"></canvas>
+        </div>
+        <div class="radar-label-bottom">Once we have responses from your whole team, we'll share the aggregated results</div>
+        <div id="resultsAction" style="margin-top: 24px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    console.log('=== SCRIPT LOADING ===');
+    console.log('DI Soundcheck v13 - JavaScript starting...');
+    /*
+    VERSION 13 CHANGES:
+    - Added Google Form submission (23 fields: portfolio, project, album, 3 theme scores, 18 question scores)
+    - Added Portfolio and Project dropdowns to non-Rickroll results screen
+    - Added Submit Results button to non-Rickroll results (replaces Take the Quiz Again)
+    - Added Take the Quiz Again button to Rickroll results only
+    - Submit button disabled until both dropdowns selected
+    - On submit: POST to Google Form, disable button, show confirmation message
+    - Question scores captured by original question ID regardless of shuffle order
+    - I don't know responses submit as 0
+    Date: 2025
+    */
+    
+    // ===== STATE MANAGEMENT =====
+    const state = {
+      currentQuestion: 0,
+      answers: {},
+      questions: [],
+      totalQuestions: 18,
+      currentArchetype: null,
+      currentThemeScores: null
+    };
+    
+    // ===== QUESTION BANK (v11 - updated questions, themes, and answer options) =====
+    const QUESTION_BANK = [
+      // CUSTOMER EXPERIENCE THEME (Q1-Q6)
+      {
+        id: 1,
+        theme: 'customerExperience',
+        text: "When deciding between two design directions your team...",
+        options: [
+          { text: "Discusses it internally and goes with whatever the lead recommends.", score: 1 },
+          { text: "Weighs the pros and cons internally factoring in effort and feasibility.", score: 2 },
+          { text: "Forms a recommendation internally and brings both directions to the client to decide.", score: 3 },
+          { text: "Evaluates both directions against existing insights and aligns with stakeholders.", score: 4 },
+          { text: "Tests both options with users and presents a recommendation to the client.", score: 5 }
+        ]
+      },
+      {
+        id: 2,
+        theme: 'customerExperience',
+        text: "User testing reveals people struggle with a core feature. Your team...",
+        options: [
+          { text: "Attributes the struggle to a training gap and develops additional materials.", score: 1 },
+          { text: "Acknowledges the feedback and adds it to the backlog for future consideration.", score: 2 },
+          { text: "Tickets the issue and iterates on the feature in an upcoming sprint.", score: 3 },
+          { text: "Digs into why users are struggling and redesigns based on what they actually need.", score: 4 },
+          { text: "Investigates the root cause, retests with users, and checks for similar issues elsewhere.", score: 5 }
+        ]
+      },
+      {
+        id: 3,
+        theme: 'customerExperience',
+        text: "The team gets negative feedback during a demo. Afterward your team...",
+        options: [
+          { text: "Regroups briefly and tries to do better next time.", score: 1 },
+          { text: "Talks through the feedback as a team and discusses what to do differently.", score: 2 },
+          { text: "Huddles, identifies what needs to change, and tickets the work for an upcoming sprint.", score: 3 },
+          { text: "Aligns on a path forward and loops back with the customer to confirm next steps.", score: 4 },
+          { text: "Digs into root cause, closes the loop with the customer, and adjusts the process.", score: 5 }
+        ]
+      },
+      {
+        id: 4,
+        theme: 'customerExperience',
+        text: "After delivering MVP your team's approach to collecting and acting on feedback is...",
+        options: [
+          { text: "Keeps an ear out and picks up on feedback when it comes up naturally.", score: 1 },
+          { text: "Asks for feedback at the end of demos or check-ins.", score: 2 },
+          { text: "Collects feedback through demos or UAT and the BA grooms it into tickets.", score: 3 },
+          { text: "Uses interviews, surveys, and usability testing, then prioritizes with the customer.", score: 4 },
+          { text: "Has feedback mechanisms built into the product and uses data alongside user input.", score: 5 }
+        ]
+      },
+      {
+        id: 5,
+        theme: 'customerExperience',
+        text: "Your customer is uncomfortable and growing anxious about the project. Your team...",
+        options: [
+          { text: "Tries to figure it out as a team and updates the customer at the next check-in.", score: 1 },
+          { text: "Reaches out to the customer, lets them know the team is aware, and checks in regularly.", score: 2 },
+          { text: "Gets on a call, walks the customer through where things stand, and talks through priorities.", score: 3 },
+          { text: "Digs into what's driving the anxiety and lands on a plan with the customer together.", score: 4 },
+          { text: "Rarely gets here because the customer stays close enough that concerns get handled early.", score: 5 }
+        ]
+      },
+      {
+        id: 6,
+        theme: 'customerExperience',
+        text: "A customer requirement is vague and could be interpreted in several different ways. Your team...",
+        options: [
+          { text: "Goes with the most reasonable interpretation and moves forward.", score: 1 },
+          { text: "Discusses the ambiguity internally and agrees on an interpretation as a team.", score: 2 },
+          { text: "Reaches out to the customer for clarification before moving forward.", score: 3 },
+          { text: "Aligns internally first, then goes to the customer with clear questions and options.", score: 4 },
+          { text: "Works with the customer to understand the underlying need and align on direction.", score: 5 }
+        ]
+      },
+
+      // PROVEN DELIVERY THEME (Q7-Q11)
+      {
+        id: 7,
+        theme: 'provenDelivery',
+        text: "A new project kicks off next week. Your team...",
+        options: [
+          { text: "Finds out about it at standup and figures out what needs to happen from there.", score: 1 },
+          { text: "Schedules a kickoff meeting to align on scope, roles, and responsibilities.", score: 2 },
+          { text: "Prepares internally and reaches out to the customer early to establish ways of working.", score: 3 },
+          { text: "Aligns internally, meets with the customer, and makes sure the team understands the problem before diving in.", score: 4 },
+          { text: "Does their homework before kickoff and brings the customer a draft problem statement.", score: 5 }
+        ]
+      },
+      {
+        id: 8,
+        theme: 'provenDelivery',
+        text: "Your team is struggling with a common understanding of goals and direction. As a team you...",
+        options: [
+          { text: "Defers to the PM who points to the contract and defines what the team is doing.", score: 1 },
+          { text: "Gets together internally and agrees on a shared interpretation.", score: 2 },
+          { text: "Aligns internally first, then brings the customer in to confirm direction.", score: 3 },
+          { text: "Gets the team and customer together and lands on a shared direction.", score: 4 },
+          { text: "Brings the full team and client stakeholders together to define the vision and get buy-in.", score: 5 }
+        ]
+      },
+      {
+        id: 9,
+        theme: 'provenDelivery',
+        text: "A developer hits a technical blocker with the current design. They...",
+        options: [
+          { text: "Works through it independently and keeps trying.", score: 1 },
+          { text: "Raises it to their tech lead and waits for direction.", score: 2 },
+          { text: "Flags it in standup and the group works through it together.", score: 3 },
+          { text: "Reaches out directly to design and relevant teammates to solve it together.", score: 4 },
+          { text: "Design and dev stay close enough that blockers get caught before they escalate.", score: 5 }
+        ]
+      },
+      {
+        id: 10,
+        theme: 'provenDelivery',
+        text: "Your team needs to hand off and share work across roles. You...",
+        options: [
+          { text: "Each role uses their own tools and shares outputs when asked.", score: 1 },
+          { text: "Shares work informally: a file drop or quick message when ready.", score: 2 },
+          { text: "Has agreed on shared tools but each role still tends to work separately.", score: 3 },
+          { text: "Works out of shared tools so everything is visible without having to ask.", score: 4 },
+          { text: "Uses the same tools across every role so handoffs are clean and nothing gets lost.", score: 5 }
+        ]
+      },
+      {
+        id: 11,
+        theme: 'provenDelivery',
+        text: "Several new members are joining the project team in different roles. Your team...",
+        options: [
+          { text: "Lets the PM handle it so the team can keep working.", score: 1 },
+          { text: "Makes sure new members can find what they need and who to ask.", score: 2 },
+          { text: "Gets new members up to speed and introduces them around.", score: 3 },
+          { text: "Takes time with new members and makes sure they understand how the team works.", score: 4 },
+          { text: "Gets the full team together to realign before diving back in.", score: 5 }
+        ]
+      },
+
+      // TECHNICAL EXPERTISE THEME (Q12-Q18)
+      {
+        id: 12,
+        theme: 'technicalExpertise',
+        text: "Development is complete for a new feature. Before it ships your team...",
+        options: [
+          { text: "Does a quick check to make sure it's working and moves on.", score: 1 },
+          { text: "Tests the feature manually to confirm the main functionality works.", score: 2 },
+          { text: "Runs QA, regression testing, and peer review before it ships.", score: 3 },
+          { text: "Runs a full validation cycle: QA, regression, usability testing, and customer sign-off.", score: 4 },
+          { text: "Completes full pre-ship validation, then monitors performance and feeds findings back.", score: 5 }
+        ]
+      },
+      {
+        id: 13,
+        theme: 'technicalExpertise',
+        text: "Your team notices a task that repeats every sprint. You...",
+        options: [
+          { text: "Factor it into sprint capacity and make sure it gets done.", score: 1 },
+          { text: "Bring it up in retro and agree to keep an eye on it.", score: 2 },
+          { text: "Create a template enabler ticket that gets pulled into the backlog each sprint.", score: 3 },
+          { text: "Pause to understand why it keeps recurring and automate or streamline it if possible.", score: 4 },
+          { text: "Look for repeating patterns, automates or eliminates them, and documents solutions for the broader team.", score: 5 }
+        ]
+      },
+      {
+        id: 14,
+        theme: 'provenDelivery',
+        text: "The team uncovers an unmet need that suggests the current direction may need to change. Your team...",
+        options: [
+          { text: "Runs with it and starts pulling the work in a new direction.", score: 1 },
+          { text: "Notes it in the backlog and keeps moving on current priorities.", score: 2 },
+          { text: "Huddles to talk it through and agrees on whether it's worth acting on.", score: 3 },
+          { text: "Digs into what's behind it and brings it to the client with a point of view.", score: 4 },
+          { text: "Weighs it against project direction and works with the client on the potential change.", score: 5 }
+        ]
+      },
+      {
+        id: 15,
+        theme: 'technicalExpertise',
+        text: "After sprint planning and stories are committed the client introduces new priorities. Your team...",
+        options: [
+          { text: "Goes with the flow and adjusts to whatever the client needs.", score: 1 },
+          { text: "Pivots to the new priorities and notes that things shifted mid-sprint.", score: 2 },
+          { text: "Reviews what's in flight, checks capacity, and proposes what stays and what rolls over.", score: 3 },
+          { text: "Pauses, talks through the trade-offs, and agrees on the highest-value outcome.", score: 4 },
+          { text: "Follows the team's agreed-upon process, evaluates impact with the client, and updates commitments.", score: 5 }
+        ]
+      },
+      {
+        id: 16,
+        theme: 'technicalExpertise',
+        text: "You are starting a new sprint. Your team's approach to planning and tracking the work is...",
+        options: [
+          { text: "Assigns work at the start and checks in when something is due or blocked.", score: 1 },
+          { text: "Plans and tracks through Jira and completes work on or before due dates.", score: 2 },
+          { text: "Holds a planning meeting, assigns stories, and estimates based on capacity.", score: 3 },
+          { text: "Reviews what was planned vs. completed, checks dependencies, and refines stories.", score: 4 },
+          { text: "Pulls the team together, plans to outcomes, and tracks task completion and impact.", score: 5 }
+        ]
+      },
+      {
+        id: 17,
+        theme: 'technicalExpertise',
+        text: "The approved tech stack has limitations for what you're trying to build. Your team...",
+        options: [
+          { text: "Does their best with the tools they have.", score: 1 },
+          { text: "Flags the limitations to the customer before building begins.", score: 2 },
+          { text: "Identifies workarounds and alternatives internally, then brings both to the customer.", score: 3 },
+          { text: "Evaluates alternatives against specific criteria and makes a decision with the customer.", score: 4 },
+          { text: "Defaults to the simplest solution and only expands the stack when the value justifies it.", score: 5 }
+        ]
+      },
+      {
+        id: 18,
+        theme: 'technicalExpertise',
+        text: "A feature could be met with an out-of-the-box solution or custom development. Your team...",
+        options: [
+          { text: "Always out of the box.", score: 1 },
+          { text: "Defaults to out-of-the-box but checks whether it can meet the need before committing.", score: 2 },
+          { text: "Discusses the pros and cons with the customer and lets them decide.", score: 3 },
+          { text: "Evaluates both options against cost, effort, and schedule, then presents a recommendation.", score: 4 },
+          { text: "Gets clear on the outcome first, then picks the solution that won't limit future needs.", score: 5 }
+        ]
+      }
+    ];
+    
+    // ===== ARCHETYPE DATA (All 11 archetypes) =====
+    const ARCHETYPES = {
+      headliners: {
+        name: "The Headliners",
+        album: "Sgt. Pepper's Lonely Hearts Club Band",
+        artist: "The Beatles",
+        imageUrl: "https://raw.githubusercontent.com/KJPeppers/soundcheck-albums/32ffb6f3788f2f9f2fa1e3008534d529a63e9ba6/sgt_peppers.jpg",
+        narrative: {
+          p1: "You're not just playing the hits, you're redefining the whole show. Like the Beatles in '67, you've mastered every track. User research? Locked. Collaboration? A symphony. Technical delivery? Flawless execution. You don't follow the formula. You write it.",
+          p2: "Everyone's watching because you set the standard. Every album you drop raises expectations. You've proven you can do it all without compromise.",
+          p3: "Stay hungry. The moment you think you've peaked is the moment you start to fade. Keep experimenting. Keep evolving. Keep proving there's no ceiling."
+        }
+      },
+      storytellers: {
+        name: "The Storytellers",
+        album: "Hamilton",
+        artist: "Original Broadway Cast",
+        imageUrl: "https://raw.githubusercontent.com/KJPeppers/soundcheck-albums/refs/heads/main/hamilton.jpg",
+        narrative: {
+          p1: "You know how to work a room and make people feel something. Like Lin-Manuel turning history into hip-hop, you transform messy problems into narratives everyone can rally behind. Users, stakeholders, the whole cast—you bring them into the story and make them care.",
+          p2: "Your collaboration hits different. Cross-functional integration isn't aspiration, it's your choreography. You've built the trust and rhythm that turn teams into ensembles.",
+          p3: "Where's your next act? Technical delivery. You've nailed the script, now tighten the production. Stronger DevSecOps and modern tech will help you stage that story faster and cleaner."
+        }
+      },
+      innovators: {
+        name: "The Innovators",
+        album: "Emancipation",
+        artist: "Prince",
+        imageUrl: "https://raw.githubusercontent.com/KJPeppers/soundcheck-albums/refs/heads/main/emancipation.jpg",
+        narrative: {
+          p1: "You see what others miss and build it on your own terms. Deep user insight meets serious technical craft. You validate with data, test with real people, then execute with precision. Like Prince dropping a triple album independently, you do it your way and it works.",
+          p2: "You don't ship features. You ship solutions that actually land. That's the difference between playing notes and making music.",
+          p3: "Your next level? Bring the band in. Tighter cross-functional collaboration and deeper customer co-creation will amplify what you're already doing. Even Prince needed an ensemble sometimes."
+        }
+      },
+      powerhouse: {
+        name: "The Powerhouse",
+        album: "There Is Nothing Left to Lose",
+        artist: "Foo Fighters",
+        imageUrl: "https://raw.githubusercontent.com/KJPeppers/soundcheck-albums/refs/heads/main/nothing_left_to_lose.jpg",
+        narrative: {
+          p1: "You execute like a machine built from spare parts and pure will. Collaboration? Dialed in. Technical delivery? Relentless. When you commit to building something, it happens. Like the Foo Fighters rebuilding after chaos, you've stripped away the noise and built something that stands.",
+          p2: "Your ensemble energy is real. Designers and developers actually jam together. Your agile practices aren't performance, they're the real set. Customers show up and stay involved.",
+          p3: "Growth edge? Spend more time in discovery. You're unstoppable at execution, add deeper user research and you'll ensure you're building anthems, not just tracks."
+        }
+      },
+      researchers: {
+        name: "The Researchers",
+        album: "In a Time Lapse",
+        artist: "Ludovico Einaudi",
+        imageUrl: "https://raw.githubusercontent.com/KJPeppers/soundcheck-albums/refs/heads/main/in_a_time_lapse.jpg",
+        narrative: {
+          p1: "You live in the pauses between notes. While other teams rush to the chorus, you're still listening, validating, testing, gathering the quiet truths. Like Einaudi's compositions, you're patient. You understand that clarity can't be rushed.",
+          p2: "User needs aren't abstract for you. You hear the difference between what people ask for and what they actually need. That ear is your edge.",
+          p3: "Now bring it to the stage. Your insights deserve tighter collaboration and stronger technical practices to turn understanding into performance. Don't let your research stay in rehearsal."
+        }
+      },
+      collaborators: {
+        name: "The Collaborators",
+        album: "Be",
+        artist: "Common",
+        imageUrl: "https://raw.githubusercontent.com/KJPeppers/soundcheck-albums/refs/heads/main/be.jpg",
+        narrative: {
+          p1: "You've cracked the hardest part: working together like it means something. Cross-functional integration isn't a buzzword, it's your baseline. Customers are collaborators, not clients. Roles are clear. Trust is built. Like Common creating community through hip-hop, you've made something bigger than the work itself.",
+          p2: "Most teams stumble over silos and egos. Not you. You've invested in the foundation: team forming, shared rituals, psychological safety. That's the hardest groove to find.",
+          p3: "Now point that energy at users and technical craft. Stronger discovery and better DevSecOps will ensure you're collaborating around the right problems and delivering what you co-create."
+        }
+      },
+      builders: {
+        name: "The Builders",
+        album: "Rage Against the Machine",
+        artist: "Rage Against the Machine",
+        imageUrl: "https://raw.githubusercontent.com/KJPeppers/soundcheck-albums/refs/heads/main/rage_against_machine.jpg",
+        narrative: {
+          p1: "You build with fury and precision. Like Rage's self-titled debut, your technical game is uncompromising—every riff matters, every system locked in. Modern stack, automation, continuous testing. When there's code to write or infrastructure to stand up, you don't just deliver. You make it hit.",
+          p2: "CI/CD pipelines work. Code reviews happen. Your production machine runs tight and loud. You've mastered the technical craft.",
+          p3: "But even Rage needed to know what to rage against. Get closer to users. Tighten collaboration. Make sure all that power is aimed at the right target. Your technical intensity deserves strategic direction worth fighting for."
+        }
+      },
+      studioBand: {
+        name: "The Studio Band",
+        album: "Ten",
+        artist: "Pearl Jam",
+        imageUrl: "https://raw.githubusercontent.com/KJPeppers/soundcheck-albums/refs/heads/main/ten.jpg",
+        narrative: {
+          p1: "You're the pros who show up, plug in, and deliver. Consistent. Reliable. No drama. You understand the fundamentals across discovery, collaboration, and delivery, and you execute them without missing a beat. Like Pearl Jam's debut, you're well-crafted and built to last.",
+          p2: "Being well-rounded matters more than people think. You don't create risk. Stakeholders know what they're getting. You deliver solid work, on time, every time.",
+          p3: "Your opportunity? Pick one track to master. Maybe user testing, maybe automation, maybe co-creation. You're already good; small refinements will make you unforgettable. The difference between good and great is closer than you think."
+        }
+      },
+      coversBand: {
+        name: "The Covers Band",
+        album: "Missundaztood",
+        artist: "P!nk",
+        imageUrl: "https://raw.githubusercontent.com/KJPeppers/soundcheck-albums/refs/heads/main/missundaztood.jpg",
+        narrative: {
+          p1: "You're raw and uneven and that's the point. Some nights you're fire. Other nights? Still figuring it out. Your DI practice is a setlist of hits and misses: strong in some songs, still learning others. Like P!nk, you're not here to be perfect. You're here to be real.",
+          p2: "The inconsistency isn't failure. Maybe your collaboration slaps but your user research is thin. Or your tech is modern but your process is chaos. You're experimenting, adapting, finding your sound.",
+          p3: "Pick one song to nail. Focus there. Let the rest catch up later. Progress beats perfection every time. You'll find your groove."
+        }
+      },
+      garageBand: {
+        name: "The Garage Band",
+        album: "The Wanderer",
+        artist: "O.A.R.",
+        imageUrl: "https://raw.githubusercontent.com/KJPeppers/soundcheck-albums/refs/heads/main/the_wanderer.jpg",
+        narrative: {
+          p1: "Every headliner started in a garage. Right now, that's you. You're early: learning the chords, finding your rhythm, figuring out what works. Like O.A.R. wandering toward their sound, you're on the journey. This isn't where you'll stay. It's where you start.",
+          p2: "What matters most? You're here. You're trying. You're playing. That's more than most teams can say.",
+          p3: "Pick one thing—user testing, automation, better collaboration—and get tight on it. Small wins build setlists. Before you know it, you'll be selling out shows. Every great band started exactly where you are."
+        }
+      },
+      unknown: {
+        name: "The Unknown",
+        album: "Never Gonna Give You Up",
+        artist: "Rick Astley",
+        imageUrl: "https://raw.githubusercontent.com/KJPeppers/soundcheck-albums/refs/heads/main/never_gonna_give_you_up.jpg",
+        narrative: {
+          p1: "Well, well, well. Look who tried to skip to the good part. You either don't know your setlist well enough yet, or you thought you could just show up without rehearsing. Bold move. Respect the confidence, at least.",
+          p2: "Here's the thing: we can't tell you what kind of band you are if you don't play enough songs. It's like calling yourself a musician after one open mic. We want to help, but you gotta give us something to work with.",
+          p3: "Go back. Answer honestly. Let's figure out your sound. We promise to never give you up if you promise to never let us down."
+        },
+        rickroll: true
+      }
+    };
+    
+    // ===== UTILITY: SHUFFLE ARRAY =====
+    function shuffleArray(array) {
+      const shuffled = [...array];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    }
+    
+    // ===== SHOW/HIDE SCREENS =====
+    function showScreen(screenId) {
+      console.log('showScreen called with:', screenId);
+      
+      // Hide all screens
+      document.querySelectorAll('.screen').forEach(screen => {
+        console.log('Removing active from:', screen.id);
+        screen.classList.remove('active');
+      });
+      
+      // Show target screen
+      const targetScreen = document.getElementById(screenId);
+      if (targetScreen) {
+        console.log('Adding active to:', screenId);
+        targetScreen.classList.add('active');
+      } else {
+        console.error('Target screen not found:', screenId);
+      }
+      
+      // Verify what's active now
+      const activeScreens = document.querySelectorAll('.screen.active');
+      console.log('Active screens after switch:', activeScreens.length);
+      activeScreens.forEach(s => console.log('  -', s.id));
+    }
+    
+    // ===== START QUIZ =====
+    function startQuiz() {
+      console.log('=== START QUIZ CALLED ===');
+      console.log('Current screen:', document.querySelector('.screen.active').id);
+      
+      // Shuffle questions
+      state.questions = shuffleArray(QUESTION_BANK);
+      console.log('Questions shuffled:', state.questions.length);
+      
+      // Shuffle options within each question
+      state.questions.forEach(question => {
+        question.shuffledOptions = shuffleArray(question.options);
+      });
+      console.log('Options shuffled');
+      
+      // Reset state
+      state.currentQuestion = 0;
+      state.answers = {};
+      
+      // Show quiz screen and display first question
+      console.log('Switching to quiz screen...');
+      showScreen('quizScreen');
+      console.log('Displaying first question...');
+      displayQuestion();
+      console.log('=== START QUIZ COMPLETE ===');
+    }
+    
+    // ===== DISPLAY QUESTION =====
+    function displayQuestion() {
+      const question = state.questions[state.currentQuestion];
+      const questionNum = state.currentQuestion + 1;
+      
+      // Update header
+      document.getElementById('currentQuestionNum').textContent = questionNum;
+      
+      // Update progress bar
+      const progress = (state.currentQuestion / state.totalQuestions) * 100;
+      document.getElementById('progressBar').style.width = progress + '%';
+      
+      // Display instruction ABOVE question
+      const instructionContainer = document.getElementById('questionInstruction');
+      instructionContainer.innerHTML = `
+        <div class="question-instruction">
+          Select the response that sounds MOST like your team's typical approach.
+        </div>
+      `;
+      
+      // Display question text
+      document.getElementById('questionText').textContent = question.text;
+      
+      // Display answer options
+      const optionsContainer = document.getElementById('answerOptions');
+      optionsContainer.innerHTML = '';
+      
+      // Render shuffled options
+      question.shuffledOptions.forEach((option, index) => {
+        const optionDiv = document.createElement('div');
+        optionDiv.className = 'answer-option';
+        optionDiv.innerHTML = `
+          <input type="radio" name="answer" id="option${index}" value="${index}">
+          <label for="option${index}">${option.text}</label>
+        `;
+        
+        // Check if this was previously selected
+        if (state.answers[question.id] && state.answers[question.id].optionIndex === index) {
+          optionDiv.classList.add('selected');
+          optionDiv.querySelector('input').checked = true;
+        }
+        
+        optionDiv.addEventListener('click', () => selectOption(optionDiv, index, option.score, question));
+        optionsContainer.appendChild(optionDiv);
+      });
+      
+      // Add "I don't know" option
+      const dontKnowDiv = document.createElement('div');
+      dontKnowDiv.className = 'answer-option answer-option-dontknow';
+      dontKnowDiv.innerHTML = `
+        <input type="radio" name="answer" id="optionDontKnow" value="dontknow">
+        <label for="optionDontKnow">I don't know</label>
+      `;
+      
+      if (state.answers[question.id] && state.answers[question.id].score === 0) {
+        dontKnowDiv.classList.add('selected');
+        dontKnowDiv.querySelector('input').checked = true;
+      }
+      
+      dontKnowDiv.addEventListener('click', () => selectOption(dontKnowDiv, 'dontknow', 0, question));
+      optionsContainer.appendChild(dontKnowDiv);
+      
+      // Update button states
+      updateButtonStates();
+    }
+    
+    // ===== SELECT OPTION =====
+    function selectOption(optionElement, optionIndex, score, question) {
+      // Remove previous selection
+      document.querySelectorAll('.answer-option').forEach(opt => {
+        opt.classList.remove('selected');
+        opt.querySelector('input').checked = false;
+      });
+      
+      // Mark new selection
+      optionElement.classList.add('selected');
+      optionElement.querySelector('input').checked = true;
+      
+      // Store answer
+      state.answers[question.id] = {
+        optionIndex: optionIndex,
+        score: score,
+        theme: question.theme
+      };
+      
+      // Enable Next button
+      updateButtonStates();
+    }
+    
+    // ===== UPDATE BUTTON STATES =====
+    function updateButtonStates() {
+      const question = state.questions[state.currentQuestion];
+      const hasAnswer = state.answers[question.id] !== undefined;
+      
+      // Previous button
+      const prevBtn = document.getElementById('prevBtn');
+      prevBtn.disabled = state.currentQuestion === 0;
+      
+      // Next button
+      const nextBtn = document.getElementById('nextBtn');
+      nextBtn.disabled = !hasAnswer;
+      
+      // Update Next button text on last question
+      if (state.currentQuestion === state.totalQuestions - 1) {
+        nextBtn.textContent = 'See Results';
+      } else {
+        nextBtn.textContent = 'Next';
+      }
+    }
+    
+    // ===== NAVIGATION =====
+    function nextQuestion() {
+      if (state.currentQuestion < state.totalQuestions - 1) {
+        state.currentQuestion++;
+        displayQuestion();
+      } else {
+        // Last question - calculate results
+        calculateResults();
+      }
+    }
+    
+    function previousQuestion() {
+      if (state.currentQuestion > 0) {
+        state.currentQuestion--;
+        displayQuestion();
+      }
+    }
+    
+    // ===== CALCULATE RESULTS =====
+    function calculateResults() {
+      console.log('=== CALCULATING RESULTS ===');
+      console.log('Answers:', state.answers);
+      
+      // Initialize scores
+      const themeScores = {
+        customerExperience: 0,
+        provenDelivery: 0,
+        technicalExpertise: 0
+      };
+      
+      const themeCounts = {
+        customerExperience: 0,
+        provenDelivery: 0,
+        technicalExpertise: 0
+      };
+      
+      let totalAnswered = 0;
+      
+      // Calculate theme scores
+      Object.values(state.answers).forEach(answer => {
+        themeScores[answer.theme] += answer.score;
+        // Only count as answered/participating if they selected a scored option (not "I don't know")
+        if (answer.score > 0) {
+          themeCounts[answer.theme]++;
+          totalAnswered++;
+        }
+      });
+      
+      console.log('Theme scores:', themeScores);
+      console.log('Theme counts:', themeCounts);
+      console.log('Total answered:', totalAnswered);
+      
+      // Check Rickroll triggers
+      const entireThemesSkipped = Object.values(themeCounts).filter(count => count === 0).length;
+      console.log('Entire themes skipped:', entireThemesSkipped);
+      
+      if (totalAnswered < 12 || entireThemesSkipped >= 2) {
+        console.log('RICKROLL TRIGGERED!');
+        displayResults(ARCHETYPES.unknown, themeScores);
+        return;
+      }
+      
+      // Categorize theme scores
+      function categorizeScore(score) {
+        if (score >= 22) return 'strong';
+        if (score >= 14) return 'moderate';
+        return 'developing';
+      }
+      
+      const customerExperience = categorizeScore(themeScores.customerExperience);
+      const provenDelivery = categorizeScore(themeScores.provenDelivery);
+      const technicalExpertise = categorizeScore(themeScores.technicalExpertise);
+      
+      console.log('Categorized scores:', { customerExperience, provenDelivery, technicalExpertise });
+      
+      // Determine archetype based on pattern
+      let archetype;
+      
+      // Strong-Strong-Strong
+      if (customerExperience === 'strong' && provenDelivery === 'strong' && technicalExpertise === 'strong') {
+        archetype = ARCHETYPES.headliners;
+      }
+      // Strong-Strong-ModDev
+      else if (customerExperience === 'strong' && provenDelivery === 'strong' && technicalExpertise !== 'strong') {
+        archetype = ARCHETYPES.storytellers;
+      }
+      // Strong-ModDev-Strong
+      else if (customerExperience === 'strong' && provenDelivery !== 'strong' && technicalExpertise === 'strong') {
+        archetype = ARCHETYPES.innovators;
+      }
+      // ModDev-Strong-Strong
+      else if (customerExperience !== 'strong' && provenDelivery === 'strong' && technicalExpertise === 'strong') {
+        archetype = ARCHETYPES.powerhouse;
+      }
+      // Strong-ModDev-ModDev
+      else if (customerExperience === 'strong' && provenDelivery !== 'strong' && technicalExpertise !== 'strong') {
+        archetype = ARCHETYPES.researchers;
+      }
+      // ModDev-Strong-ModDev
+      else if (customerExperience !== 'strong' && provenDelivery === 'strong' && technicalExpertise !== 'strong') {
+        archetype = ARCHETYPES.collaborators;
+      }
+      // ModDev-ModDev-Strong
+      else if (customerExperience !== 'strong' && provenDelivery !== 'strong' && technicalExpertise === 'strong') {
+        archetype = ARCHETYPES.builders;
+      }
+      // Moderate-Moderate-Moderate
+      else if (customerExperience === 'moderate' && provenDelivery === 'moderate' && technicalExpertise === 'moderate') {
+        archetype = ARCHETYPES.studioBand;
+      }
+      // Developing-Developing-Developing
+      else if (customerExperience === 'developing' && provenDelivery === 'developing' && technicalExpertise === 'developing') {
+        archetype = ARCHETYPES.garageBand;
+      }
+      // All other patterns (catch-all)
+      else {
+        archetype = ARCHETYPES.coversBand;
+      }
+      
+      console.log('Assigned archetype:', archetype.name);
+      console.log('=== RESULTS CALCULATED ===');
+      
+      displayResults(archetype, themeScores);
+    }
+    
+    // ===== DISPLAY RESULTS =====
+    function displayResults(archetype, themeScores) {
+      console.log('=== DISPLAYING RESULTS ===');
+      console.log('Archetype:', archetype.name);
+      
+      // Show results screen
+      showScreen('resultsScreen');
+      
+      // Display album title and artist (archetype name removed)
+      document.getElementById('albumTitle').textContent = archetype.album;
+      document.getElementById('artistName').textContent = archetype.artist;
+      
+      // Display narratives
+      document.getElementById('narrative1').textContent = archetype.narrative.p1;
+      document.getElementById('narrative2').textContent = archetype.narrative.p2;
+      document.getElementById('narrative3').textContent = archetype.narrative.p3;
+      
+      // Display album cover (with fallback)
+      const albumContainer = document.getElementById('albumCoverContainer');
+      albumContainer.innerHTML = `
+        <img src="${archetype.imageUrl}" 
+             alt="${archetype.album} album cover" 
+             class="album-cover"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="album-cover-fallback" style="display:none;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+          </svg>
+          <div class="fallback-album-title">${archetype.album}</div>
+          <div class="fallback-artist-name">${archetype.artist}</div>
+        </div>
+      `;
+      
+      // If Rickroll, embed GIF in radar container
+      if (archetype.rickroll) {
+        console.log('RICKROLL - Displaying GIF');
+        const radarContainer = document.querySelector('.radar-container');
+        radarContainer.innerHTML = `
+          <div style="text-align: center; padding: 20px;">
+            <img src="https://media.giphy.com/media/Vuw9m5wXviFIQ/giphy.gif" 
+                 alt="Never Gonna Give You Up" 
+                 style="max-width: 100%; height: auto; border-radius: 8px; margin-bottom: 16px;">
+            <p style="font-family: 'Nunito Sans', sans-serif; font-size: 14px; color: var(--charcoal); margin-top: 8px;">
+              Complete more questions for your full results.
+            </p>
+          </div>
+        `;
+        // Rickroll: show Take the Quiz Again button only
+        document.getElementById('resultsAction').innerHTML = `
+          <div style="text-align: center;">
+            <button class="btn btn-primary" onclick="resetQuiz()">Take the Quiz Again</button>
+          </div>
+        `;
+      } else {
+        // Draw radar chart
+        drawRadarChart(themeScores);
+
+        // Non-Rickroll: show submission form
+        const portfolioOptions = PORTFOLIOS.map(p => `<option value="${p}">${p}</option>`).join('');
+        const projectOptions = PROJECTS.map(p => `<option value="${p}">${p}</option>`).join('');
+
+        document.getElementById('resultsAction').innerHTML = `
+          <div class="submission-form">
+            <select id="portfolioSelect" class="submission-select" onchange="updateSubmitButton()">
+              <option value="">Select Portfolio...</option>
+              ${portfolioOptions}
+            </select>
+            <select id="projectSelect" class="submission-select" onchange="updateSubmitButton()">
+              <option value="">Select Project...</option>
+              ${projectOptions}
+            </select>
+            <button class="btn btn-primary" id="submitBtn" onclick="handleSubmit()" disabled>Submit Results</button>
+          </div>
+        `;
+
+        // Store archetype and themeScores for submission
+        state.currentArchetype = archetype;
+        state.currentThemeScores = themeScores;
+      }
+      
+      console.log('=== RESULTS DISPLAYED ===');
+    }
+    
+    // ===== DRAW RADAR CHART (Placeholder) =====
+    function drawRadarChart(themeScores) {
+      console.log('Drawing radar chart with scores:', themeScores);
+      
+      // Calculate Essential scores (distribute theme scores across 3 essentials each)
+      const essentialScores = {
+        1: themeScores.provenDelivery / 3,          // Holistic (Proven Delivery)
+        2: themeScores.customerExperience / 3,       // User Needs (Customer Experience)
+        3: themeScores.provenDelivery / 3,           // Cross-Functional (Proven Delivery)
+        4: themeScores.customerExperience / 3,       // Bring Customers In (Customer Experience)
+        5: themeScores.customerExperience / 3,       // Feedback Loops (Customer Experience)
+        6: themeScores.technicalExpertise / 3,       // DevSecOps (Technical Expertise)
+        7: themeScores.technicalExpertise / 3,       // Modern Tech (Technical Expertise)
+        8: (themeScores.customerExperience + themeScores.provenDelivery + themeScores.technicalExpertise) / 9, // Data-Driven (all questions)
+        9: themeScores.technicalExpertise / 3        // Agile (Technical Expertise)
+      };
+      
+      console.log('Essential scores:', essentialScores);
+      
+      const canvas = document.getElementById('radarChart');
+      if (!canvas) {
+        console.error('Radar chart canvas not found');
+        return;
+      }
+      
+      const ctx = canvas.getContext('2d');
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const radius = 150;
+      
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Draw background circles (scale)
+      ctx.strokeStyle = '#E8E9EA';
+      ctx.lineWidth = 1;
+      for (let i = 1; i <= 5; i++) {
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, (radius / 5) * i, 0, 2 * Math.PI);
+        ctx.stroke();
+      }
+      
+      // Draw axes and labels
+      const essentials = [
+        'Holistic',
+        'User Needs',
+        'Cross-Functional',
+        'Bring Customers In',
+        'Feedback Loops',
+        'DevSecOps',
+        'Modern Tech',
+        'Data-Driven',
+        'Agile'
+      ];
+      
+      const colors = [
+        '#DA10AB', // Essential 1
+        '#00B0E6', // Essential 2
+        '#94007B', // Essential 3
+        '#6DD6FF', // Essential 4
+        '#FEB0F9', // Essential 5
+        '#4A5156', // Essential 6
+        '#777C80', // Essential 7
+        '#00709D', // Essential 8
+        '#ACE2FF'  // Essential 9
+      ];
+      
+      const angleStep = (2 * Math.PI) / 9;
+      const points = [];
+      
+      essentials.forEach((label, index) => {
+        const angle = angleStep * index - Math.PI / 2; // Start at top
+        
+        // Draw axis line
+        ctx.strokeStyle = '#E8E9EA';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.lineTo(
+          centerX + radius * Math.cos(angle),
+          centerY + radius * Math.sin(angle)
+        );
+        ctx.stroke();
+        
+        // Draw label
+        const labelDistance = radius + 20;
+        const labelX = centerX + labelDistance * Math.cos(angle);
+        const labelY = centerY + labelDistance * Math.sin(angle);
+        
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '12px Roboto';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(label, labelX, labelY);
+        
+        // Calculate point position based on score
+        const score = essentialScores[index + 1];
+        const normalizedScore = score / 10; // Max score per essential is 10 (30/3)
+        const pointRadius = radius * normalizedScore;
+        
+        points.push({
+          x: centerX + pointRadius * Math.cos(angle),
+          y: centerY + pointRadius * Math.sin(angle),
+          color: colors[index]
+        });
+      });
+      
+      // Draw data polygon
+      ctx.fillStyle = 'rgba(218, 16, 171, 0.2)';
+      ctx.strokeStyle = '#DA10AB';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      points.forEach((point, index) => {
+        if (index === 0) {
+          ctx.moveTo(point.x, point.y);
+        } else {
+          ctx.lineTo(point.x, point.y);
+        }
+      });
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      
+      // Draw data points
+      points.forEach((point) => {
+        ctx.fillStyle = point.color;
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, 6, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.stroke();
+      });
+      
+      console.log('Radar chart drawn');
+    }
+    
+    // ===== SUBMISSION BUTTON STATE =====
+    function updateSubmitButton() {
+      const portfolio = document.getElementById('portfolioSelect')?.value;
+      const project = document.getElementById('projectSelect')?.value;
+      const submitBtn = document.getElementById('submitBtn');
+      if (submitBtn) {
+        submitBtn.disabled = !(portfolio && project);
+      }
+    }
+
+    // ===== HANDLE SUBMIT =====
+    function handleSubmit() {
+      const portfolio = document.getElementById('portfolioSelect').value;
+      const project = document.getElementById('projectSelect').value;
+      const submitBtn = document.getElementById('submitBtn');
+
+      if (!portfolio || !project) return;
+
+      // Disable button immediately to prevent double submission
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting...';
+
+      submitToGoogleForm(portfolio, project, state.currentArchetype, state.currentThemeScores)
+        .then(() => {
+          // Replace entire submission form with confirmation
+          document.getElementById('resultsAction').innerHTML = `
+            <div class="submission-confirmation">
+              Thanks for submitting!
+            </div>
+          `;
+          console.log('Form submitted successfully');
+        })
+        .catch(err => {
+          // Re-enable button on error
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Submit Results';
+          console.error('Submission error:', err);
+        });
+    }
+
+    // ===== GOOGLE FORM SUBMISSION =====
+    const FORM_ID = '1FAIpQLSdGRqvGhxy4BucwwxjoPRHuSWaa8XMl_gMhDeCAQ5DuJvwqQA';
+    const FORM_ENDPOINT = `https://docs.google.com/forms/d/e/${FORM_ID}/formResponse`;
+
+    const FORM_FIELDS = {
+      portfolio:          'entry.682283282',
+      project:            'entry.996806354',
+      album:              'entry.44120815',
+      customerExperience: 'entry.1820062093',
+      provenDelivery:     'entry.1380904896',
+      technicalExpertise: 'entry.862573675',
+      q1:  'entry.486732663',
+      q2:  'entry.116655338',
+      q3:  'entry.1446466544',
+      q4:  'entry.1263157119',
+      q5:  'entry.2028314775',
+      q6:  'entry.378773354',
+      q7:  'entry.863764772',
+      q8:  'entry.576956734',
+      q9:  'entry.80582380',
+      q10: 'entry.1560823949',
+      q11: 'entry.1377575634',
+      q12: 'entry.350458964',
+      q13: 'entry.616144422',
+      q14: 'entry.1000698596',
+      q15: 'entry.14987751',
+      q16: 'entry.1112451272',
+      q17: 'entry.1755995015',
+      q18: 'entry.2114251015'
+    };
+
+    const PORTFOLIOS = ['CS&D', 'HC&J'];
+
+    const PROJECTS = [
+      'CDC CAOS',
+      'FEMA D2C',
+      'DEA Diversion',
+      'CBP HRM - EOP',
+      'CBP HRM - Data Modernization',
+      'USCG',
+      'USPTO'
+    ];
+
+    function getQuestionScoreById(questionId) {
+      // Find the answer by original question ID regardless of shuffle order
+      const answer = state.answers[questionId];
+      return answer ? answer.score : 0;
+    }
+
+    function submitToGoogleForm(portfolio, project, archetype, themeScores) {
+      const body = new URLSearchParams();
+
+      // Identifier fields
+      body.append(FORM_FIELDS.portfolio, portfolio);
+      body.append(FORM_FIELDS.project, project);
+      body.append(FORM_FIELDS.album, archetype.album);
+
+      // Theme scores
+      body.append(FORM_FIELDS.customerExperience, themeScores.customerExperience);
+      body.append(FORM_FIELDS.provenDelivery, themeScores.provenDelivery);
+      body.append(FORM_FIELDS.technicalExpertise, themeScores.technicalExpertise);
+
+      // Individual question scores by original ID
+      for (let i = 1; i <= 18; i++) {
+        body.append(FORM_FIELDS[`q${i}`], getQuestionScoreById(i));
+      }
+
+      return fetch(FORM_ENDPOINT, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body.toString()
+      });
+    }
+
+    // ===== RESET =====
+    function resetQuiz() {
+      state.currentQuestion = 0;
+      state.answers = {};
+      state.currentArchetype = null;
+      state.currentThemeScores = null;
+      
+      // Restore radar container in case Rickroll GIF replaced it
+      const radarContainer = document.querySelector('.radar-container');
+      if (radarContainer) {
+        radarContainer.innerHTML = '<canvas id="radarChart" width="400" height="400"></canvas>';
+      }
+
+      // Clear results action area
+      const resultsAction = document.getElementById('resultsAction');
+      if (resultsAction) {
+        resultsAction.innerHTML = '';
+      }
+      
+      showScreen('introScreen');
+    }
+    
+    // ===== INITIALIZE EVENT LISTENERS =====
+    console.log('Setting up event listeners...');
+    
+    // Wait for DOM to be fully loaded
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeEventListeners);
+    } else {
+      // DOM already loaded
+      initializeEventListeners();
+    }
+    
+    function initializeEventListeners() {
+      console.log('Initializing event listeners...');
+      
+      const startButton = document.getElementById('startButton');
+      if (startButton) {
+        console.log('Start button found, attaching click handler');
+        startButton.addEventListener('click', function() {
+          console.log('=== START BUTTON CLICKED ===');
+          startQuiz();
+        });
+      } else {
+        console.error('Start button NOT FOUND!');
+      }
+      
+      console.log('Event listeners initialized');
+    }
+    
+    console.log('DI Soundcheck POC v2 - Section 2: Quiz functionality loaded');
+  </script>
+
+</body>
+</html>
